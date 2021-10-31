@@ -1,0 +1,87 @@
+1.- OBTENER PRODUCTO:
+
+    1.1.- Listar todos los productos temporales
+        URL:
+            http://192.168.0.231:85/productos.php?tienda={idtienda}
+        METODO:
+            GET
+
+    1.2.- Listar productos reales por número de páginas
+        URL:
+            http://192.168.0.231:85/productos.php?page={numero de la página}&tienda={código de la tienda}
+        METODO:
+            GET
+
+    1.2.- Obtener un solo producto temporal
+        URL:
+            http://192.168.0.231:85/productos.php?tienda={idtienda}&producto={idproducto}
+        METODO:
+            GET
+
+    1.2.- Buscar un producto reales por descripcion o codigo
+        URL:
+            http://192.168.0.231:85/productos.php?tienda={idtienda}&buscar=[parametro de busqueda]
+        METODO:
+            GET
+
+    
+
+
+2.- INSERTAR PRODUCTO de la tabla temporal:
+
+    URL:
+        http://192.168.0.231:85/productos.php
+    METODO:
+        POST
+    CUERPO:
+        {
+            "idtienda":"1",
+            "categoria":"Indumentaria",
+            "subcategoria":"Dorso Superior",
+            "producto":"nombre del producto",
+            "observacion":"observacion si tuviera, sino va null",
+            "modelo":"modelo si tuviera, nino va null",
+            "idusuario":"1",
+            "token":"f182c6cb959756e622cbe7313bd925ad"
+        }
+
+ 3.- ACTUALIZAR PRODUCTO de la tabla temporal:
+
+    URL:
+        http://192.168.0.231:85/productos.php
+    METODO:
+        POST
+    CUERPO:
+        {
+            "idtienda":"1",
+            "idproducto":"1",
+            "idcategoria":"1",
+            "idsubcategoria":"1",
+            "producto":"nombre del producto",
+            "observacion":"observacion si tuviera, sino va null",
+            "modelo":"modelo si tuviera, nino va null",
+            "idUnidadMedida":"1",
+            "idusuario":"1",
+            "token":"f182c6cb959756e622cbe7313bd925ad"
+        }
+
+4.- Eliminar producto de la tabla temporal
+
+    URL:
+        http://192.168.0.231:85/productos.php
+    METODO:
+        POST
+    CUERPO:
+        {
+            "idtienda":"1",
+            "idproducto":"1",
+            "idusuario":"1",
+            "token":"f182c6cb959756e622cbe7313bd925ad"
+        }
+
+
+5.- Obtener categorias
+    URL:
+        http://192.168.0.231:85/categoria.php?tienda={idtienda}
+    METODO:
+        GET
