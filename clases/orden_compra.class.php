@@ -51,7 +51,7 @@ class orden_compra extends conexion{
                     ,a.producto
                     ,ifnull(a.marca,'Sin Marca') marca
                     ,a.moneda
-                    ,sum(a.cantidad * a.precio) subtotal
+                    ,f_precio_string(sum(a.cantidad * a.precio)) subtotal
                 from
                     vorde_compra_detalle a
                 where
@@ -102,7 +102,7 @@ class orden_compra extends conexion{
         $query = "select
                     a.color_codigo
                     ,a.color
-                    ,sum(a.cantidad * a.precio) subtotal
+                    ,f_precio_string(sum(a.cantidad * a.precio)) subtotal
                 from
                     vorde_compra_detalle a
                 where
@@ -144,8 +144,8 @@ class orden_compra extends conexion{
         $query = "select
                     a.talla
                     ,a.cantidad
-                    ,a.precio
-                    ,a.cantidad * a.precio subtotal
+                    ,f_precio_string(a.precio) precio
+                    ,f_precio_string(a.cantidad * a.precio) subtotal
                 from
                     vorde_compra_detalle a
                 where
