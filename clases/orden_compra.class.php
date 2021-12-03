@@ -3,7 +3,73 @@ require_once 'conexion/conexion.php';
 require_once 'respuestas.class.php';
 
 class orden_compra extends conexion{
-    
+
+    private $compra = "";
+    private $categoria = "";
+    private $subcategoria = "";
+    private $producto = "";
+    private $marca = "";
+    private $moneda = "";
+    private $estado = "";
+
+    public function sendOrdenCompra($json){
+        $_respuesta = new respuestas;
+        $datos = json_decode($json,true);
+        //============================================================================INI-TOKEN
+        if(!isset($datos['token'])){
+            return $_respuesta->error_401();
+        }else {
+            $tokenarray = $this->getToken($datos['token']);
+            if(!$tokenarray){
+                return $_respuesta->error_401("El token que ha enviado es inválido o ha caducado");
+            }
+        }
+        //============================================================================FIN-TOKEN
+        
+        if (!isset($datos['compra']) || !isset($datos['categoria']) || !isset($datos['subcategoria']) 
+        || !isset($datos['producto']) || !isset($datos['marca']) || !isset($datos['moneda'])
+        || !isset($datos['estado'])){
+            return $_respuesta-> error_400();
+        }else{
+            $this->compra       = $datos['compra'];
+            $this->categoria    = $datos['categoria'];
+            $this->subcategoria = $datos['subcategoria'];
+            $this->producto     = $datos['producto'];
+            $this->marca        = $datos['marca'];
+            $this->moneda       = $datos['moneda'];
+            $this->estado       = $datos['estado'];
+
+            //Actualizamos la Orden de Compra como anulado / eliminado
+            $query = "  update	detalle_compras
+                        set		codigo_estado = :estado
+                        where	compras_codigo = :compra
+                                and categorias_codigo = :categoria
+                                and subcategoria_codigo = :subcategoria
+                                and productos_codigo = :producto
+                                and ifnull(marca_codigo,0) = :marca
+                                and moneda_codigo = :moneda";
+            $params = [
+                'compra'        => $this->compra,
+                'categoria'     => $this->categoria,
+                'subcategoria'  => $this->subcategoria,
+                'producto'      => $this->producto,
+                'marca'         => $this->marca,
+                'moneda'        => $this->moneda,
+                'estado'        => $this->estado
+            ];
+            $resulset = parent::noResultQuery($query,$params);
+            if ($resulset){
+            $result = $_respuesta->response;
+            $result['status'] = "ok";
+            $result['result'] = array(
+                "mensaje" => "Datos guardados correctamente"
+            );
+            return $result;
+            }else{
+            return $_respuesta->error500("Ocurrió un problema enviando datos al servicio.");
+            }
+        }
+    }
 
     public function getOrdenCompra($tienda,$usuario){
   
@@ -16,6 +82,9 @@ class orden_compra extends conexion{
                     a.tienda_codigo = :tienda
                     and a.usuarios_codigo = :usuario
                     and a.estado_codigo = 1
+                    and exists (select 1 from detalle_compras x
+								where x.compras_codigo = a.codigo
+								and x.codigo_estado = 1)
                 order by a.fecha desc";
         $params = [
             'tienda' => $tienda,
@@ -56,6 +125,7 @@ class orden_compra extends conexion{
                     vorde_compra_detalle a
                 where
                     a.compras_codigo = :compra
+                    and a.codigo_estado = 1
                 group by a.categorias_codigo
                     ,a.subcategoria_codigo
                     ,a.productos_codigo
@@ -146,6 +216,7 @@ class orden_compra extends conexion{
                     ,a.cantidad
                     ,f_precio_string(a.precio) precio
                     ,f_precio_string(a.cantidad * a.precio) subtotal
+                    ,a.codigo codigo_detalle
                 from
                     vorde_compra_detalle a
                 where
@@ -155,8 +226,7 @@ class orden_compra extends conexion{
                     and a.productos_codigo = :prod
                     and a.moneda_codigo = :moneda
                     and ifnull(a.marca_codigo,0) = :marca
-                    and a.color_codigo = :color
-                ";
+                    and a.color_codigo = :color";
         $params = [
             'compra' => $compra,
             'cat' => $cat,
@@ -224,6 +294,38 @@ class orden_compra extends conexion{
         return $sql;
     }
 
+    private function getToken($token){
+        $query = "  select	id,userid,estado
+                    from	usuario_token
+                    where token = :token
+                    and estado = 1
+                    and now() between fecha and date_add(fecha, interval 4 hour)";
+        $params = [
+            'token' => $token
+        ];
+        $resp = parent::getParamDatos($query,$params);
+        if ($resp){
+            return $resp;
+        }else{
+            return 0;
+        }
+    }
+
+    private function extenderToken($tokenid){
+        $query = "update usuario_token
+                    set fecha = now()
+                    where id = :id";
+        $params = ['id' => $tokenid];
+        $resp = parent::noResultQuery($query,$params);
+        if ($resp) {
+            return $resp;
+        }else{
+            return 0;
+        }
+    }
+
 }
+
+
 
 ?>
