@@ -10,10 +10,9 @@ header("Content-Type: application/json");
 switch($_SERVER['REQUEST_METHOD']){
     /*================================================================================================================================= */
     case 'POST': 
-        //$postBody = file_get_contents('php://input');
-        //$resp = $_producto->insertProducto($postBody);
-        //echo json_encode($resp);
-
+        $postBody = file_get_contents('php://input');
+        $resp = $_orden_compra->sendOrdenCompra($postBody);
+        echo json_encode($resp);
         break;
     /*================================================================================================================================= */
     case 'GET':
