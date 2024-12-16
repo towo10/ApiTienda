@@ -1,11 +1,12 @@
 <?php
 class conexion {
-    private $hos;
+    private $host;
     private $port;
     private $db;
     private $user;
     private $password;
     private $charset;
+    private $conn;
 
     public function __construct(){
         $listaDB = $this->infodb();
@@ -36,7 +37,7 @@ class conexion {
 
     private function infodb(){
         $direccion = dirname(__FILE__);
-        $jsondata = file_get_contents($direccion."/"."config");
+        $jsondata = file_get_contents($direccion."/"."config.json");
         return json_decode($jsondata,true);
     }
 
