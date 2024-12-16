@@ -1,5 +1,5 @@
-# PersonalDataApi
-Api de la aplicación
+# ApiTienda
+Api de la aplicación Tienda
 
 # Datos de conección PDO-MYSQL
 File=/class/connection/config.json
